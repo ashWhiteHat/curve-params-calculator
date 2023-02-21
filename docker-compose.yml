@@ -1,0 +1,9 @@
+version: '3'
+services:
+    sage:
+      build: .
+      container_name: sage
+      tty: true
+      stdin_open: true
+      volumes:
+        - .:/app
