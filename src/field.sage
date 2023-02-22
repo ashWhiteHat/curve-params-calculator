@@ -1,7 +1,7 @@
 # secp256k1
 
 # field prime order
-p = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f
+p = 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001
 
 # field representation
 limbs_length = 4
@@ -11,10 +11,8 @@ u64_max = 2**64
 u256_max = 2**256
 u512_max = 2**512
 u768_max = 2**768
-little_fermat = u64_max - 2
 
 def calculate_field_params():
-    print(hex(p))
     modulus = fp_to_u64_limbs(p)
     r = fp_to_u64_limbs(u256_max % p)
     r2 = fp_to_u64_limbs(u512_max % p)
@@ -26,8 +24,8 @@ def calculate_field_params():
     print_limbs("R", r)
     print_limbs("R2", r2)
     print_limbs("R3", r3)
-    print("INV")
-    print(hex(inv))
+    print(f"const INV: u64 = {hex(inv)};")
+    print()
 
 def fp_to_u64_limbs(f):
     limbs = []
@@ -37,8 +35,9 @@ def fp_to_u64_limbs(f):
     return limbs
 
 def print_limbs(m, limbs):
-    print(m)
+    print(f"const {m}: [u64; 4] = [")
     for limb in limbs:
-        print(hex(limb))
+        print(f"    0x{hex(limb)[2:].zfill(16)},")
+    print("];\n")
 
 calculate_field_params()
