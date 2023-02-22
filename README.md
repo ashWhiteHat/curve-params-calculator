@@ -11,9 +11,18 @@ $ docker-compose up
 $ docker-compose exec sage sage src/field.sage
 ```
 
-Command outputs rust constants necessary for construction of field as following.
+Command outputs rust field sorce code with indicated order $p$ as following and you can run the test to check whether the code is valid.
 
 ```rust
+use serde::{Deserialize, Serialize};
+use zero_crypto::arithmetic::bits_256::*;
+use zero_crypto::common::*;
+use zero_crypto::dress::field::*;
+
+
+#[derive(Clone, Copy, Decode, Encode, Serialize, Deserialize)]
+pub struct Fp(pub(crate) [u64; 4]);
+
 const MODULUS: [u64; 4] = [
     0x43e1f593f0000001,
     0x2833e84879b97091,
@@ -43,4 +52,32 @@ const R3: [u64; 4] = [
 ];
 
 const INV: u64 = 0xc2e1f593efffffff;
+
+const GENERATOR: [u64; 4] = [7, 0, 0, 0];
+
+impl Fp {
+    pub const fn to_mont_form(val: [u64; 4]) -> Self {
+        Self(to_mont_form(val, R2, MODULUS, INV))
+    }
+
+    pub(crate) const fn montgomery_reduce(self) -> [u64; 4] {
+        mont(
+            [self.0[0], self.0[1], self.0[2], self.0[3], 0, 0, 0, 0],
+            MODULUS,
+            INV,
+        )
+    }
+}
+
+prime_field_operation!(Fp, MODULUS, GENERATOR, INV, R, R2, R3);
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use paste::paste;
+    use rand_core::OsRng;
+
+    field_test!(fp_field, Fp, 1000);
+}
+
 ```
