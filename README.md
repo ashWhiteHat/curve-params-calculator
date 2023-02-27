@@ -4,6 +4,8 @@ This is used for curve params calculation for `zero-crypto` by **sagemath**.
 
 ## Usage
 
+### Finite Field
+
 Replace [`field.sage`](./src/field.sage) p param with your preference.
 
 ```
